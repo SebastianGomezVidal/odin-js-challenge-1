@@ -1,16 +1,53 @@
-function getComputerChoice() {
-  const random = Math.random();
+export class Game {
+  constructor() {
+    this.playerScore = 0;
+    this.pcScore = 0;
+  }
 
-  if (random < 0.33) {
-    return "paper";
-  } else if (random >= 0.33 && random < 0.66) {
-    return "scissors";
-  } else {
-    return "rock";
+  getScore() {
+    return {
+      playerScore: this.playerScore,
+      pcScore: this.pcScore,
+    };
+  }
+
+  getComputerChoice() {
+    const random = Math.random();
+    if (random < 0.33) {
+      return "paper";
+    } else if (random >= 0.33 && random < 0.66) {
+      return "scissors";
+    } else {
+      return "rock";
+    }
+  }
+
+  determineGameWinner(humanSelection, computerSelection) {
+    if (humanSelection === computerSelection) return "It's a draw!";
+    else if (
+      (humanSelection === "rock" && computerSelection === "scissors") ||
+      (humanSelection === "scissors" && computerSelection === "paper") ||
+      (humanSelection === "paper" && computerSelection === "rock")
+    ) {
+      this.playerScore++;
+      return "User wins!";
+    } else {
+      this.pcScore++;
+      return "Computer wins!";
+    }
+  }
+
+  play(event) {
+    const playerSelection = event.target.innerText
+      .replace(/🪨|🗞️|✂️/g, "")
+      .trim()
+      .toLowerCase();
+    const pcSelection = this.getComputerChoice();
+    return this.determineGameWinner(playerSelection, pcSelection);
   }
 }
 
-function getHumanChoice() {
+/* function getHumanChoice() {
   const options = ["paper", "scissors", "rock"];
 
   // Create a formatted string for options
@@ -31,9 +68,9 @@ function getHumanChoice() {
 
   alert("Invalid choice. Please try again.");
   getHumanChoice();
-}
+} */
 
-function getGameScore(rounds, computerScore, humanScore) {
+/* function getGameScore(rounds, computerScore, humanScore) {
   console.log(
     `     *******************************************
      * Welcome to Game Rock - Scissors - Paper * 
@@ -45,10 +82,10 @@ function getGameScore(rounds, computerScore, humanScore) {
         machine score: ${computerScore} 
          player score: ${humanScore} \n\n`
   );
-}
+} */
 
-function playRound() {
-  const humanSelection = getHumanChoice();
+/* function playRound() {
+  const humanSelection = userOption;
   const computerSelection = getComputerChoice();
 
   if (humanSelection === computerSelection) return "tie";
@@ -60,8 +97,8 @@ function playRound() {
     return "human";
   else return "computer";
 }
-
-function playGame() {
+ */
+/* function playGame() {
   let humanScore = 0;
   let computerScore = 0;
 
@@ -78,6 +115,4 @@ function playGame() {
     }
     getGameScore(rounds, computerScore, humanScore);
   }
-}
-
-playGame();
+} */
