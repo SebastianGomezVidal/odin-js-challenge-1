@@ -1,42 +1,64 @@
 import { Game } from "./game.js";
 
-const optionsList = document.querySelector("ul");
-const scoreBanner = document.querySelector(".statistics");
-const pcScore = document.getElementById("pc");
-const playerScore = document.getElementById("user");
+// Element Locators
+const optionsListUl = document.querySelector("ul");
+const scoreBoardP = document.querySelector(".statistics-board");
+const pcScoreSpan = document.getElementById("pc");
+const playerScoreSpan = document.getElementById("user");
 
+// Data dependencies
+const winningSound = new Audio("./assets/cheering-crowd.wav");
 const game = new Game();
 
-const finishedGame = new CustomEvent("finishedGame", {
-  detail: { message: "The game has finished" },
-});
+//Custom event
+const updateScoreEvent = new CustomEvent("updateScoreEvent");
+const checkGameWinner = new CustomEvent("checkGameWinner");
 
-optionsList.addEventListener("click", (event) => {
+//Listeners
+optionsListUl.addEventListener("click", async (event) => {
   event.stopPropagation();
-  const playStatus = game.play(event);
+
+  const playStatus = await game.play(event);
   alert(`${playStatus}`);
-  scoreBanner.click();
+
+  await new Promise((resolve) => {
+    scoreBoardP.dispatchEvent(updateScoreEvent);
+    resolve();
+  });
 });
 
-scoreBanner.addEventListener("click", (event) => {
+scoreBoardP.addEventListener("updateScoreEvent", async (event) => {
+  event.stopPropagation();
+
+  await updateScore();
+
+  await new Promise((resolve) => {
+    scoreBoardP.dispatchEvent(checkGameWinner);
+    resolve();
+  });
+});
+
+scoreBoardP.addEventListener("checkGameWinner", async (event) => {
   event.stopPropagation();
 
   const score = game.getScore();
-  pcScore.innerText = score.pcScore;
-  playerScore.innerText = score.playerScore;
-
-  if (score.playerScore == 5) end("player");
-  if (score.pcScore == 5) end("computer");
+  if (score.playerScore == 5) await endGame("player");
+  else if (score.pcScore == 5) await endGame("computer");
 });
 
-scoreBanner.addEventListener("endGame", (event) => {
-  alert(event.detail.message);
-  location.reload();
-});
+//Utilities
+async function updateScore() {
+  const score = game.getScore();
+  pcScoreSpan.innerText = score.pcScore;
+  playerScoreSpan.innerText = score.playerScore;
+}
 
-function end(winner) {
-  const endGame = new CustomEvent("endGame", {
-    detail: { message: `The game is finished, ${winner} has won!` },
-  });
-  scoreBanner.dispatchEvent(endGame);
+async function endGame(winner) {
+  winningSound.play();
+  alert(`The ${winner} has won!`);
+  game.resetScore();
+  winningSound.onended = () => {
+    scoreBoardP.dispatchEvent(updateScoreEvent);
+    resolve();
+  };
 }

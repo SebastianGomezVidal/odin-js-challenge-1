@@ -4,6 +4,11 @@ export class Game {
     this.pcScore = 0;
   }
 
+  resetScore() {
+    this.playerScore = 0;
+    this.pcScore = 0;
+  }
+
   getScore() {
     return {
       playerScore: this.playerScore,
@@ -37,12 +42,13 @@ export class Game {
     }
   }
 
-  play(event) {
+  async play(event) {
     const playerSelection = event.target.innerText
       .replace(/🪨|🗞️|✂️/g, "")
       .trim()
       .toLowerCase();
     const pcSelection = this.getComputerChoice();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return this.determineGameWinner(playerSelection, pcSelection);
   }
 }
